@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class ChatInputMessage {
     private String type; // "chat" 또는 "done"
     private String memberId;
-    private String message;     // type == "chat"일 때만 사용
+    private String message; // type == "chat"일 때만 사용
     private String timestamp;
 }
