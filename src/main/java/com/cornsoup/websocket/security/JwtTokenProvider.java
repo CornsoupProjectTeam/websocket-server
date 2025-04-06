@@ -2,19 +2,14 @@ package com.cornsoup.websocket.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
-
-    @Value("${jwt.secret}")
-    private String secretKeyPlain;
 
     private Key key;
 
@@ -22,9 +17,13 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        if (secretKeyPlain.length() < 32) {
-            throw new IllegalArgumentException("SECRET_KEY는 최소 32자 이상이어야 합니다.");
+        // 환경변수에서 SECRET_KEY 가져오기
+        String secretKeyPlain = System.getenv("SECRET_KEY");
+
+        if (secretKeyPlain == null || secretKeyPlain.length() < 32) {
+            throw new IllegalArgumentException("환경변수 SECRET_KEY는 반드시 존재하고, 32자 이상이어야 합니다.");
         }
+
         this.key = Keys.hmacShaKeyFor(secretKeyPlain.getBytes(StandardCharsets.UTF_8));
     }
 
