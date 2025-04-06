@@ -8,6 +8,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
+
 @Configuration
 @EnableWebSocket
 @RequiredArgsConstructor
@@ -18,8 +19,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(chatWebSocketHandler, "/ws/chat")
+        registry.addHandler(chatWebSocketHandler, "/ws")
                 .addInterceptors(jwtHandshakeInterceptor)
                 .setAllowedOrigins("*"); // CORS 허용 (모든 Origin 허용), 운영 시 도메인 제한)
     }
+
 }
