@@ -11,6 +11,7 @@ import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
@@ -32,20 +33,21 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
         log.info("메시지 수신 - sessionId: {}, payload: {}", session.getId(), message.getPayload());
+        CompletableFuture.runAsync(() -> {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                ChatInputMessage input = mapper.readValue(message.getPayload(), ChatInputMessage.class);
 
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            ChatInputMessage input = mapper.readValue(message.getPayload(), ChatInputMessage.class);
+                // 토큰 기반 memberId 덮어쓰기
+                String memberId = (String) session.getAttributes().get("memberId");
+                input.setMemberId(memberId);
+                input.setTimestamp(Instant.now().toString());
 
-            // 토큰 기반 memberId 덮어쓰기
-            String memberId = (String) session.getAttributes().get("memberId");
-            input.setMemberId(memberId);
-            input.setTimestamp(Instant.now().toString());
-
-            chatInputProducer.send(input);
-        } catch (Exception e) {
-            log.error("메시지 처리 중 오류 발생", e);
-        }
+                chatInputProducer.send(input);
+            } catch (Exception e) {
+                log.error("메시지 처리 중 오류 발생", e);
+            }
+        });
     }
 
     @Override
