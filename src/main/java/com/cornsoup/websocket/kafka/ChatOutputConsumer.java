@@ -56,12 +56,12 @@ public class ChatOutputConsumer {
 
                 session.sendMessage(new TextMessage(payload));
 
-                log.info("클라이언트로 메시지 전송 - memberId: {}", memberId);
+                log.info("Message sent to client - memberId: {}", memberId);
             } catch (Exception e) {
-                log.error("WebSocket 전송 실패 - memberId: {}, error: {}", memberId, e.getMessage(), e);
+                log.error("WebSocket message sending failed - memberId: {}, error: {}", memberId, e.getMessage(), e);
             }
         } else {
-            log.warn("연결된 세션 없음 - memberId: {}", memberId);
+            log.warn("No active session found - memberId: {}", memberId);
         }
     }
 

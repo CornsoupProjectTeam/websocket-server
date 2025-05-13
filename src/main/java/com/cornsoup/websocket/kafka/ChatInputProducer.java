@@ -15,7 +15,7 @@ public class ChatInputProducer {
 
     public void send(ChatInputMessage message) {
         kafkaTemplate.send("chat_input", message.getMemberId(), message);
-        log.info("Kafka 발행 완료 - type: {}, memberId: {}, message: {}",
+        log.info("Kafka message published successfully - type: {}, memberId: {}, message: {}",
                 message.getType(), message.getMemberId(), message.getMessage());
     }
 }

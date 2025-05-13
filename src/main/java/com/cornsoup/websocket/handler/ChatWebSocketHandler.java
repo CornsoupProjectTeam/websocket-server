@@ -23,16 +23,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        log.info("WebSocket 연결 완료 - sessionId: {}", session.getId());
+        log.info("WebSocket connection established - sessionId: {}", session.getId());
 
         String memberId = (String) session.getAttributes().get("memberId");
         sessionManager.register(memberId, session);
-        log.info("세션 등록 완료 - memberId: {}", memberId);
+        log.info("Session successfully registered - memberId: {}", memberId);
     }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
-        log.info("메시지 수신 - sessionId: {}, payload: {}", session.getId(), message.getPayload());
+        log.info("Message received - sessionId: {}, payload: {}", session.getId(), message.getPayload());
         CompletableFuture.runAsync(() -> {
             try {
                 ObjectMapper mapper = new ObjectMapper();
@@ -45,7 +45,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
                 chatInputProducer.send(input);
             } catch (Exception e) {
-                log.error("메시지 처리 중 오류 발생", e);
+                log.error("An error occurred while processing the message", e);
             }
         });
     }
@@ -54,11 +54,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String memberId = (String) session.getAttributes().get("memberId");
         sessionManager.remove(memberId);
-        log.info("WebSocket 연결 종료 - memberId: {}", memberId);
+        log.info("WebSocket connection closed - memberId: {}", memberId);
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) {
-        log.error("전송 오류 - sessionId: {}, error: {}", session.getId(), exception.getMessage());
+        log.error("Message sending error - sessionId: {}, error: {}", session.getId(), exception.getMessage());
     }
 }
