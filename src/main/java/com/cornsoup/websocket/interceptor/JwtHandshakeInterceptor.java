@@ -34,14 +34,14 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
             // 2. 토큰 존재 여부 체크
             if (token == null || token.isEmpty()) {
-                log.warn("WebSocket 연결 실패 - 토큰 없음");
+                log.warn("WebSocket connection failed - Token not provided.");
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return false;
             }
 
             // 3. 토큰 유효성 검증
             if (!jwtTokenProvider.validateToken(token)) {
-                log.warn("WebSocket 연결 실패 - 토큰 검증 실패");
+                log.warn("WebSocket connection failed: Token validation failed.");
                 response.setStatusCode(HttpStatus.UNAUTHORIZED);
                 return false;
             }
@@ -49,11 +49,11 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             // 4. memberId 추출 및 저장
             String memberId = jwtTokenProvider.extractMemberId(token);
             attributes.put("memberId", memberId);
-            log.info("WebSocket 연결 요청 - memberId: {}", memberId);
+            log.info("WebSocket connection attempt - memberId: {}", memberId);
             return true;
 
         } catch (Exception e) {
-            log.error("WebSocket 연결 중 예외 발생: {}", e.getMessage(), e);
+            log.error("An exception occurred while establishing WebSocket connection: {}", e.getMessage(), e);
             response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
             return false;
         }
