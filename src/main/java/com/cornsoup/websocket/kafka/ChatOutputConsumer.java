@@ -2,6 +2,7 @@ package com.cornsoup.websocket.kafka;
 
 import com.cornsoup.websocket.kafka.dto.ChatOutputForClient;
 import com.cornsoup.websocket.kafka.dto.ChatOutputMessage;
+import com.cornsoup.websocket.kafka.dto.ChatOutputWithTypeForClient;
 import com.cornsoup.websocket.session.SessionManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +34,26 @@ public class ChatOutputConsumer {
 
         if (session != null && session.isOpen()) {
             try {
-                // 클라이언트용 DTO로 변환
-                ChatOutputForClient clientMessage = new ChatOutputForClient(
-                        message.getMessage(),
-                        message.getTimestamp()
-                );
+                String payload;
 
-                String payload = objectMapper.writeValueAsString(clientMessage);
+                // type 필드가 null 이거나 비어있으면 일반 메시지
+                if (message.getType() == null || message.getType().isEmpty()) {
+                    // 일반 메시지용 DTO 변환
+                    ChatOutputForClient clientMessage = new ChatOutputForClient(
+                            message.getMessage(),
+                            message.getTimestamp()
+                    );
+                    payload = objectMapper.writeValueAsString(clientMessage);
+                } else {
+                    // type이 있는 메시지용 DTO 변환
+                    ChatOutputWithTypeForClient clientMessage = new ChatOutputWithTypeForClient(
+                            message.getType(),
+                            message.getMessage(),
+                            message.getTimestamp()
+                    );
+                    payload = objectMapper.writeValueAsString(clientMessage);
+                }
+
                 session.sendMessage(new TextMessage(payload));
 
                 log.info("클라이언트로 메시지 전송 - memberId: {}", memberId);

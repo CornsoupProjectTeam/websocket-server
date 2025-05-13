@@ -5,11 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ChatOutputMessage {
+@NoArgsConstructor
+public class ChatOutputWithTypeForClient {
     private String type;
-    private String memberId;
     private String message;
     private String timestamp;
 }
