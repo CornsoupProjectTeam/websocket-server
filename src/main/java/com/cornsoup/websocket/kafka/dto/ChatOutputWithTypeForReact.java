@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatOutputWithTypeForClient {
+public class ChatOutputWithTypeForReact {
     private String type;
-    private String message;
     private String timestamp;
 }

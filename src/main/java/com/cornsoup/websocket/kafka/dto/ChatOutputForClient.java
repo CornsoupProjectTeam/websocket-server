@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatOutputForClient {
+    private String type;
     private String message;
     private String timestamp;
 }
