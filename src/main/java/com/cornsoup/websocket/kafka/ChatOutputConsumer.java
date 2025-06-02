@@ -2,7 +2,7 @@ package com.cornsoup.websocket.kafka;
 
 import com.cornsoup.websocket.kafka.dto.ChatOutputForClient;
 import com.cornsoup.websocket.kafka.dto.ChatOutputMessage;
-import com.cornsoup.websocket.kafka.dto.ChatOutputWithTypeForClient;
+import com.cornsoup.websocket.kafka.dto.ChatOutputWithTypeForReact;
 import com.cornsoup.websocket.session.SessionManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -35,28 +35,33 @@ public class ChatOutputConsumer {
         if (session != null && session.isOpen()) {
             try {
                 String payload;
+                String type = message.getType();
 
-                // type 필드가 null 이거나 비어있으면 일반 메시지
-                if (message.getType() == null || message.getType().isEmpty()) {
-                    // 일반 메시지용 DTO 변환
+                // type 필드가 chat이면 일반 메시지
+                if ("chat".equals(type)) {
+                    // Client용 DTO
                     ChatOutputForClient clientMessage = new ChatOutputForClient(
+                            type,
                             message.getMessage(),
                             message.getTimestamp()
                     );
                     payload = objectMapper.writeValueAsString(clientMessage);
+                } else if ("done".equals(type)) {
+                    // React용 DTO
+                    ChatOutputWithTypeForReact reactMessage = new ChatOutputWithTypeForReact(
+                            type,
+                            message.getTimestamp()
+                    );
+                    payload = objectMapper.writeValueAsString(reactMessage);
                 } else {
-                    // type이 있는 메시지용 DTO 변환
-                    ChatOutputWithTypeForClient clientMessage = new ChatOutputWithTypeForClient(
-                            message.getType(),
-                            message.getMessage(),
-                            message.getTimestamp()
-                    );
-                    payload = objectMapper.writeValueAsString(clientMessage);
+                    // 로그만 남김
+                    log.warn("Unhandled message type received: {}", type);
+                    return;
                 }
 
                 session.sendMessage(new TextMessage(payload));
-
                 log.info("Message sent to client - memberId: {}", memberId);
+
             } catch (Exception e) {
                 log.error("WebSocket message sending failed - memberId: {}, error: {}", memberId, e.getMessage(), e);
             }
