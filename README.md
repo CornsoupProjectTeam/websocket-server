@@ -16,5 +16,3 @@ JWT 인증을 통해 접속한 사용자를 확인하고,
 - Spring Boot
 - WebSocket
 - Kafka (비동기 메시지 브로커)
-- JWT 인증
-- Gradle
